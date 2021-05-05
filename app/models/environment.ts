@@ -1,4 +1,4 @@
-import { Api } from "../services/api"
+import { createHttpClient } from "mst-gql"
 
 let ReactotronDev
 if (__DEV__) {
@@ -17,7 +17,7 @@ export class Environment {
       // dev-only services
       this.reactotron = new ReactotronDev()
     }
-    this.api = new Api()
+    this.gqlHttpClient = createHttpClient("https://rickandmortyapi.com/graphql")
   }
 
   async setup() {
@@ -25,7 +25,6 @@ export class Environment {
     if (__DEV__) {
       await this.reactotron.setup()
     }
-    await this.api.setup()
   }
 
   /**
@@ -34,7 +33,7 @@ export class Environment {
   reactotron: typeof ReactotronDev
 
   /**
-   * Our api.
+   * GraphQL HTTP client.
    */
-  api: Api
+  gqlHttpClient: ReturnType<typeof createHttpClient>
 }

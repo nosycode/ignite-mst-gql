@@ -23,7 +23,8 @@ import {
   setRootNavigation,
   useNavigationPersistence,
 } from "./navigators"
-import { RootStore, RootStoreProvider, setupRootStore } from "./models"
+import { RootStoreType, StoreContext } from "./models"
+import { setupRootStore } from "./models/root-store/setup-root-store"
 import { ToggleStorybook } from "../storybook/toggle-storybook"
 
 // This puts screens in a native ViewController or Activity. If you want fully native
@@ -39,7 +40,7 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
  */
 function App() {
   const navigationRef = useRef<NavigationContainerRef>()
-  const [rootStore, setRootStore] = useState<RootStore | undefined>(undefined)
+  const [rootStore, setRootStore] = useState<RootStoreType>(undefined)
 
   setRootNavigation(navigationRef)
   useBackButtonHandler(navigationRef, canExit)
@@ -65,7 +66,7 @@ function App() {
   // otherwise, we're ready to render the app
   return (
     <ToggleStorybook>
-      <RootStoreProvider value={rootStore}>
+      <StoreContext.Provider value={rootStore}>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <RootNavigator
             ref={navigationRef}
@@ -73,7 +74,7 @@ function App() {
             onStateChange={onNavigationStateChange}
           />
         </SafeAreaProvider>
-      </RootStoreProvider>
+      </StoreContext.Provider>
     </ToggleStorybook>
   )
 }

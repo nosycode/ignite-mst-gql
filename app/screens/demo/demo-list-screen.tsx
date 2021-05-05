@@ -1,10 +1,10 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Image, FlatList, TextStyle, View, ViewStyle, ImageStyle } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { observer } from "mobx-react-lite"
 import { Header, Screen, Text, Wallpaper } from "../../components"
 import { color, spacing } from "../../theme"
-import { useStores } from "../../models"
+import { useQuery } from "../../models"
 
 const FULL: ViewStyle = {
   flex: 1,
@@ -45,16 +45,16 @@ export const DemoListScreen = observer(function DemoListScreen() {
   const navigation = useNavigation()
   const goBack = () => navigation.goBack()
 
-  const { characterStore } = useStores()
-  const { characters } = characterStore
-
-  useEffect(() => {
-    async function fetchData() {
-      await characterStore.getCharacters()
-    }
-
-    fetchData()
-  }, [])
+  const { error, loading, data } = useQuery((store) =>
+    store.queryCharacters({ page: 1 }, (characters) =>
+      characters
+        .results((r) => r.name)
+        .results((r) => r.image)
+        .results((r) => r.status),
+    ),
+  )
+  if (error) return null
+  if (loading) return null
 
   return (
     <View testID="DemoListScreen" style={FULL}>
@@ -69,7 +69,7 @@ export const DemoListScreen = observer(function DemoListScreen() {
         />
         <FlatList
           contentContainerStyle={FLAT_LIST}
-          data={characters}
+          data={data.characters.results}
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
             <View style={LIST_CONTAINER}>
